@@ -235,8 +235,18 @@
             font-family: 'Courier New', Courier, monospace;
             font-size: 0.9rem;
             overflow-x: auto;
+            overflow-y: hidden;
             margin: 10px 0;
             position: relative;
+            max-width: 100%;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
         .code-block-header {
@@ -274,10 +284,32 @@
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+                line-height: 1.3;
+            }
+
+            .intro-text {
+                font-size: 0.95rem;
+            }
+
             .actions-card {
                 flex-direction: column;
                 text-align: center;
                 gap: 20px;
+                padding: 20px;
+            }
+
+            .actions-info h3 {
+                font-size: 1.1rem;
+            }
+
+            .actions-info p {
+                font-size: 0.9rem;
             }
 
             .btn-group {
@@ -287,10 +319,22 @@
 
             .btn {
                 width: 100%;
+                font-size: 0.95rem;
+                padding: 12px 20px;
+            }
+
+            .instructions {
+                padding: 25px 15px;
+            }
+
+            .instructions h2 {
+                font-size: 1.4rem;
+                margin-bottom: 25px;
             }
 
             .step {
                 flex-direction: column;
+                margin-bottom: 30px;
             }
 
             .step:not(:last-child)::after {
@@ -299,6 +343,94 @@
 
             .step-number {
                 margin-bottom: 15px;
+                width: 35px;
+                height: 35px;
+                font-size: 1.1rem;
+            }
+
+            .step-content h3 {
+                font-size: 1.1rem;
+            }
+
+            .step-content ul li {
+                font-size: 0.9rem;
+                line-height: 1.6;
+            }
+
+            .code-block {
+                font-size: 0.8rem;
+                padding: 12px;
+                overflow-x: auto;
+                word-wrap: break-word;
+            }
+
+            .code-block pre {
+                white-space: pre-wrap;
+                word-break: break-word;
+            }
+
+            .summary-box {
+                flex-direction: column;
+                padding: 20px 15px;
+                gap: 15px;
+            }
+
+            .summary-box i {
+                font-size: 1.5rem;
+            }
+
+            .summary-content h4 {
+                font-size: 1.1rem;
+            }
+
+            .summary-content ul li {
+                font-size: 0.9rem;
+            }
+
+            #toast {
+                min-width: 200px;
+                font-size: 0.9rem;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .intro-text {
+                font-size: 0.9rem;
+            }
+
+            .actions-card {
+                padding: 15px;
+            }
+
+            .instructions {
+                padding: 20px 12px;
+            }
+
+            .instructions h2 {
+                font-size: 1.2rem;
+            }
+
+            .step-content h3 {
+                font-size: 1rem;
+            }
+
+            .step-content ul li {
+                font-size: 0.85rem;
+            }
+
+            .code-block {
+                font-size: 0.75rem;
+                padding: 10px;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+                padding: 10px 16px;
             }
         }
 
