@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chia sẻ Workflow n8n - Extract Data Google Maps</title>
+    <meta name="description" content="Hướng dẫn cài đặt Workflow n8n tự động lấy thông tin khách hàng từ Google Maps.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6d5a;
+            /* n8n vibrant brand color */
+            --bg-color: #f4f6f8;
+            --text-main: #333333;
+            --text-muted: #6b7280;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+        }
+
+        .youtube-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .youtube-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .actions-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-color);
+        }
+
+        .actions-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .actions-info p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 109, 90, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 109, 90, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .instructions {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .instructions h2 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 15px;
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 20px;
+            box-shadow: 0 4px 10px rgba(255, 109, 90, 0.2);
+            z-index: 2;
+        }
+
+        /* Connecting line */
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 45px;
+            bottom: -35px;
+            width: 2px;
+            background-color: #f3f4f6;
+            z-index: 1;
+        }
+
+        .step-content {
+            flex: 1;
+            padding-top: 5px;
+        }
+
+        .step-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .step-content ul {
+            list-style-type: none;
+            margin-bottom: 15px;
+        }
+
+        .step-content ul li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+
+        .step-content ul li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .code-block {
+            background-color: #1f2937;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .code-block-header {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .summary-box {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .summary-box i {
+            color: #3b82f6;
+            font-size: 2rem;
+        }
+
+        .summary-content h4 {
+            color: #1e3a8a;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .summary-content ul li::before {
+            color: #3b82f6;
+        }
+
+        @media (max-width: 768px) {
+            .actions-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .btn-group {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .step {
+                flex-direction: column;
+            }
+
+            .step:not(:last-child)::after {
+                display: none;
+            }
+
+            .step-number {
+                margin-bottom: 15px;
+            }
+        }
+
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            font-size: 1rem;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {
+                bottom: 0;
+                opacity: 0;
+            }
+
+            to {
+                bottom: 30px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeout {
+            from {
+                bottom: 30px;
+                opacity: 1;
+            }
+
+            to {
+                bottom: 0;
+                opacity: 0;
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step {
+            transition-delay: 0.1s;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Workflow Automation n8n<br>Scrape Data Khách Hàng Doanh Nghiệp</h1>
+            <p class="intro-text">
+                Workflow này thu thập thông tin từ Google Maps, trích xuất email từ website của doanh nghiệp, xử lý qua
+                OpenAI, kiểm tra dữ liệu, và lưu vào Airtable tự động.
+            </p>
+        </header>
+
+        <div class="youtube-container"
+            style="background-color: #000; display: flex; align-items: center; justify-content: center;">
+            <a href="https://youtu.be/kejql4R27sg?si=Mxb4jOPzPK6Je8ON" target="_blank"
+                style="display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+                <img src="https://img.youtube.com/vi/kejql4R27sg/maxresdefault.jpg" alt="Video Hướng Dẫn n8n"
+                    style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s;">
+                <div
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background-color: rgba(255, 0, 0, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s;">
+                    <i class="fa-solid fa-play" style="color: white; font-size: 35px; margin-left: 8px;"></i>
+                </div>
+                <div
+                    style="position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; color: white; font-weight: bold; text-shadow: 1px 1px 4px rgba(0,0,0,0.8); font-size: 1.1rem;">
+                    Nhấn để xem video trên YouTube (Do hạn chế nhúng)
+                </div>
+            </a>
+            <style>
+                .youtube-container a:hover img {
+                    opacity: 1 !important;
+                }
+
+                .youtube-container a:hover div:nth-child(2) {
+                    transform: translate(-50%, -50%) scale(1.1) !important;
+                    background-color: #ff0000 !important;
+                }
+            </style>
+        </div>
+
+        <div class="actions-card fade-in" style="flex-direction: column; align-items: stretch; gap: 20px;">
+            <div class="actions-info" style="text-align: center;">
+                <h3>Tài Nguyên & Cài Đặt</h3>
+                <p>Tải hoặc copy file JSON cài đặt n8n, hoặc tải file tài liệu hướng dẫn (.docx).</p>
+            </div>
+            <div class="btn-group" style="justify-content: center; flex-wrap: wrap;">
+                <button onclick="downloadJSON()" class="btn btn-primary"
+                    style="background-color: var(--primary-color);">
+                    <i class="fa-solid fa-file-code"></i> Tải File JSON
+                </button>
+                <button class="btn btn-secondary" onclick="copyWorkflow()">
+                    <i class="fa-regular fa-copy"></i> Copy JSON
+                </button>
+                <a href="hd cài đặt.docx" download="hd cài đặt.docx" class="btn btn-primary"
+                    style="background-color: #2563eb; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+                    <i class="fa-solid fa-file-word"></i> Tải File Hướng Dẫn
+                </a>
+            </div>
+        </div>
+
+        <div class="instructions fade-in">
+            <h2><i class="fa-solid fa-list-check" style="color: #4b5563; margin-right: 10px;"></i> Hướng Dẫn Chi Tiết
+                Cài Đặt n8n</h2>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Manual Trigger (When clicking 'Test workflow')</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Kích hoạt workflow bằng tay.</li>
+                        <li><strong>Cách thêm vào n8n:</strong> Nhấn "+" → Chọn Manual Trigger.</li>
+                        <li>Kết nối với <em>MAP THU THẬP</em>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>MAP THU THẬP (HTTP Request Node)</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Lấy danh sách các nhà hàng từ Google Maps thông qua API Apify.
+                        </li>
+                        <li><strong>Cách thiết lập:</strong> Thêm node HTTP Request.</li>
+                        <li><strong>Method:</strong> POST</li>
+                        <li><strong>URL:</strong></li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">Bash</div>
+                        https://api.apify.com/v2/acts/compass~google-maps-extractor/run-sync-get-dataset-items?token=YOUR_APIFY_API_KEY
+                    </div>
+                    <ul>
+                        <li><strong>Body:</strong></li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">JSON</div>
+                        <pre style="font-family: inherit; margin: 0;">{
+  "categoryFilterWords": ["restaurant"],
+  "city": "HA NOI",
+  "countryCode": "vn",
+  "language": "en",
+  "maxCrawledPlacesPerSearch": 10,
+  "skipClosedPlaces": false
+}</pre>
+                    </div>
+                    <ul>
+                        <li>Kết nối với <em>Edit Fields</em>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Edit Fields (Set Node)</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Tạo các trường dữ liệu để sử dụng sau này.</li>
+                        <li><strong>Cách thiết lập:</strong> Thêm Set Node, chọn Add Field và thêm các trường:</li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">Fields Mapping</div>
+                        <pre style="font-family: inherit; margin: 0;">
+Title: ={{ $json.title }}
+Street: ={{ $json.street }}
+Neighborhood: ={{ $json.neighborhood }}
+Website: ={{ $json.website }}
+Phone: ={{ $json.phoneUnformatted }}
+URL: ={{ $json.url }}
+Domain: ={{ $json.website?.extractDomain() }}
+</pre>
+                    </div>
+                    <ul>
+                        <li>Kết nối với <em>Loop Over Items</em>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Loop Over Items (Split In Batches Node)</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Xử lý từng mục một thay vì tất cả cùng lúc (lặp qua từng mục dữ
+                            liệu).</li>
+                        <li><strong>Cách thiết lập:</strong> Thêm node Split In Batches.</li>
+                        <li><strong>Batch Size:</strong> 1 (để xử lý từng doanh nghiệp một).</li>
+                        <li>Kết nối với <em>WEB LỌC</em>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h3>WEB LỌC (HTTP Request Node)</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Lọc thông tin website và trích xuất nội dung website của doanh
+                            nghiệp.</li>
+                        <li><strong>Cách thiết lập:</strong> Thêm HTTP Request Node.</li>
+                        <li><strong>Method:</strong> GET</li>
+                        <li><strong>URL:</strong></li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">Bash</div>
+                        =https://r.jina.ai/{{ $json.Website }}
+                    </div>
+                    <ul>
+                        <li>Kết nối với <em>OpenAI</em>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">6</div>
+                <div class="step-content">
+                    <h3>OpenAI (AI Node)</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Gửi nội dung website đến OpenAI để trích xuất email.</li>
+                        <li><strong>Cách thiết lập:</strong> Thêm node OpenAI.</li>
+                        <li><strong>Model:</strong> GPT-4o-mini</li>
+                        <li><strong>Prompt:</strong></li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">Kotlin</div>
+                        <pre style="font-family: inherit; margin: 0;">
+Look at this website content and extract only the email I can contact this business.
+Provide only the email and nothing else. If no email found, return "Null".
+</pre>
+                    </div>
+                    <ul>
+                        <li><strong>Dữ liệu đầu vào:</strong></li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">Bash</div>
+                        {{$node["WEB LỌC"].json.data}}
+                    </div>
+                    <ul>
+                        <li>Kết nối với <em>DATAAAA</em>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">7</div>
+                <div class="step-content">
+                    <h3>DATAAAA (Airtable Node)</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Lưu thông tin doanh nghiệp vào Airtable.</li>
+                        <li><strong>Operation:</strong> Create Record</li>
+                        <li><strong>Base:</strong> app8Vn3LTX8ZI1NxW | <strong>Table:</strong> tblqOs1f4xJU83qSj</li>
+                        <li><strong>Fields:</strong></li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">Fields Mapping</div>
+                        <pre style="font-family: inherit; margin: 0;">
+Title: ={{ $('Loop Over Items').item.json.Title }}
+Neighborhood: ={{ $('Loop Over Items').item.json.Neighborhood }}
+Website: ={{ $('Loop Over Items').item.json.Website }}
+Phone: ={{ $('Loop Over Items').item.json.Phone }}
+Email: ={{ $json.message.content }}
+URL: ={{ $('Loop Over Items').item.json.URL }}
+Address: ={{ $('Loop Over Items').item.json.Street }}
+</pre>
+                    </div>
+                    <ul>
+                        <li>Kết nối với <em>IF Node</em>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">8</div>
+                <div class="step-content">
+                    <h3>IF Node</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Kiểm tra xem OpenAI có tìm thấy email hay không.</li>
+                        <li><strong>Điều kiện:</strong> Nếu email chứa "Null", tức là không tìm thấy email, thì tiếp tục
+                            tìm bằng API khác.</li>
+                        <li><strong>Kết nối hướng 1 (True/Có Email):</strong> Kết nối với <em>Airtable1</em> (để bỏ qua
+                            vòng quét phụ).</li>
+                        <li><strong>Kết nối hướng 2 (False/Không có Email):</strong> Kết nối với <em>MAIL</em> (để tìm
+                            email từ nguồn khác).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">9</div>
+                <div class="step-content">
+                    <h3>MAIL (HTTP Request Node)</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Nếu OpenAI không tìm thấy email, thử tìm bằng API
+                            anymailfinder.com.</li>
+                        <li><strong>Method:</strong> POST</li>
+                        <li><strong>URL:</strong></li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">Bash</div>
+                        https://api.anymailfinder.com/v5.0/search/company.json
+                    </div>
+                    <ul>
+                        <li><strong>Headers:</strong> Authorization: Bearer YOUR-API-KEY</li>
+                        <li><strong>Body:</strong></li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">JSON</div>
+                        <pre style="font-family: inherit; margin: 0;">
+{
+  "domain": "{{ $node['Loop Over Items'].json.Domain }}"
+}
+</pre>
+                    </div>
+                    <ul>
+                        <li>Kết nối với <em>Airtable1</em>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">10</div>
+                <div class="step-content">
+                    <h3>Airtable1 (Cập nhật Record cuối cùng)</h3>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Cập nhật record đã được lưu ở Airtable nếu tìm được email bằng
+                            API anymailfinder.</li>
+                        <li><strong>Operation:</strong> Update Record</li>
+                        <li><strong>Base:</strong> app8Vn3LTX8ZI1NxW | <strong>Table:</strong> tblqOs1f4xJU83qSj</li>
+                        <li><strong>Fields:</strong></li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header">Fields Mapping</div>
+                        <pre style="font-family: inherit; margin: 0;">
+ID: ={{ $('DATAAAA').item.json.id }}
+Email: ={{ JSON.stringify($json.results.emails) }}
+</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number"><i class="fa-solid fa-play"></i></div>
+                <div class="step-content">
+                    <h3>Chạy thử workflow</h3>
+                    <ul>
+                        <li>Nhấn <strong>Test Workflow</strong> trên Manual Trigger.</li>
+                        <li>Kiểm tra đầu ra trên mỗi node để đảm bảo dữ liệu đi đúng hướng.</li>
+                        <li>Kiểm tra bảng <strong>Airtable</strong> để xem thông tin được lưu như thế nào.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="summary-box fade-in">
+                <i class="fa-solid fa-rocket"></i>
+                <div class="summary-content">
+                    <h4>Tổng kết - Bạn đã tạo được Workflow tự động:</h4>
+                    <ul>
+                        <li>Thu thập doanh nghiệp từ Google Maps một cách nhanh chóng.</li>
+                        <li>Trích xuất thông tin website và làm sạch dữ liệu.</li>
+                        <li>Dùng trí tuệ nhân tạo (AI/LLM) để tìm email ẩn trong nội dung.</li>
+                        <li>Lưu dữ liệu vào hệ thống lưu trữ Airtable.</li>
+                        <li>Nếu AI không tìm thấy email, workflow sẽ thông minh dự phòng bằng API thay thế.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"><i class="fa-regular fa-circle-check"></i> Đã copy dữ liệu workflow vào clipboard!</div>
+
+    <script>
+        // Hiệu ứng Fade-in khi Scroll
+        document.addEventListener("DOMContentLoaded", function () {
+            const elements = document.querySelectorAll('.step, .fade-in');
+
+            // Xử lý các class tự động khởi tạo
+            document.querySelectorAll('.step').forEach(el => el.classList.add('fade-in'));
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            elements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+
+        const workflowData = {
+            "name": "PHOTO",
+            "nodes": [
+                {
+                    "parameters": {},
+                    "type": "n8n-nodes-base.manualTrigger",
+                    "typeVersion": 1,
+                    "position": [
+                        0,
+                        0
+                    ],
+                    "id": "9be5eb13-9dd8-4ac5-9aef-ac67ffb00d79",
+                    "name": "When clicking ‘Test workflow’"
+                },
+                {
+                    "parameters": {
+                        "assignments": {
+                            "assignments": [
+                                {
+                                    "id": "e45d7aab-0f67-4ca1-9ffb-02337c56d83e",
+                                    "name": "Title",
+                                    "value": "={{ $json.title }}",
+                                    "type": "string"
+                                },
+                                {
+                                    "id": "34334186-df38-4d28-a3b9-1c3654fd1f38",
+                                    "name": "Street",
+                                    "value": "={{ $json.street }}",
+                                    "type": "string"
+                                },
+                                {
+                                    "id": "326d9ea4-de08-463a-94cd-c3054f5a24e1",
+                                    "name": "Neighborhood",
+                                    "value": "={{ $json.neighborhood }}",
+                                    "type": "string"
+                                },
+                                {
+                                    "id": "23d4c925-b7de-48ab-8880-788be5657c89",
+                                    "name": "Website",
+                                    "value": "={{ $json.website }}",
+                                    "type": "string"
+                                },
+                                {
+                                    "id": "cb0b1338-4973-4d21-85e0-a166ca626a71",
+                                    "name": "Phone",
+                                    "value": "={{ $json.phoneUnformatted }}",
+                                    "type": "string"
+                                },
+                                {
+                                    "id": "d8428394-595c-4f60-9fd1-db90f585d53d",
+                                    "name": "URL",
+                                    "value": "={{ $json.url }}",
+                                    "type": "string"
+                                },
+                                {
+                                    "id": "cef93f44-ccae-4230-b294-8e817fe82ce0",
+                                    "name": "Domain",
+                                    "value": "={{ $json.website?.extractDomain() }}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "options": {}
+                    },
+                    "type": "n8n-nodes-base.set",
+                    "typeVersion": 3.4,
+                    "position": [
+                        420,
+                        20
+                    ],
+                    "id": "37b3eead-f217-416c-966c-0ebe8836621d",
+                    "name": "Edit Fields"
+                },
+                {
+                    "parameters": {
+                        "options": {}
+                    },
+                    "type": "n8n-nodes-base.splitInBatches",
+                    "typeVersion": 3,
+                    "position": [
+                        640,
+                        0
+                    ],
+                    "id": "166b90e6-8a3b-493c-b3cb-9143abc96a18",
+                    "name": "Loop Over Items"
+                },
+                {
+                    "parameters": {
+                        "modelId": {
+                            "__rl": true,
+                            "value": "gpt-4o-mini",
+                            "mode": "list",
+                            "cachedResultName": "GPT-4O-MINI"
+                        },
+                        "messages": {
+                            "values": [
+                                {
+                                    "content": "=Look at this website content and extract only the email I can contact this business. In your output, provide only the email and nothing else. Ideally, this email should be of business owner, so if you have 2 or more options, try for most authoritative one. If you don't find any email, output null\n\nExamplary output of yours:\n\nname@examplewebsite.com\n\n___\n\nWebsite you should analyse:\n{{$node[\"WEB LỌC\"].json.data}}."
+                                }
+                            ]
+                        },
+                        "options": {}
+                    },
+                    "type": "@n8n/n8n-nodes-langchain.openAi",
+                    "typeVersion": 1.8,
+                    "position": [
+                        1060,
+                        100
+                    ],
+                    "id": "1a6a274d-cf13-45c5-a062-d38cce3210f0",
+                    "name": "OpenAI"
+                },
+                {
+                    "parameters": {
+                        "conditions": {
+                            "options": {
+                                "caseSensitive": true,
+                                "leftValue": "",
+                                "typeValidation": "strict",
+                                "version": 2
+                            },
+                            "conditions": [
+                                {
+                                    "id": "7136a55b-0ab4-4cd0-9c19-20595d6dfca6",
+                                    "leftValue": "={{ $('OpenAI').item.json.message.content }}",
+                                    "rightValue": "Null",
+                                    "operator": {
+                                        "type": "string",
+                                        "operation": "contains"
+                                    }
+                                }
+                            ],
+                            "combinator": "and"
+                        },
+                        "options": {}
+                    },
+                    "type": "n8n-nodes-base.if",
+                    "typeVersion": 2.2,
+                    "position": [
+                        1720,
+                        100
+                    ],
+                    "id": "60674365-a2fe-4d8f-bb28-3108149a7a9d",
+                    "name": "If"
+                },
+                {
+                    "parameters": {
+                        "operation": "update",
+                        "base": {
+                            "__rl": true,
+                            "value": "app8Vn3LTX8ZI1NxW",
+                            "mode": "list",
+                            "cachedResultName": "nha",
+                            "cachedResultUrl": "https://airtable.com/app8Vn3LTX8ZI1NxW"
+                        },
+                        "table": {
+                            "__rl": true,
+                            "value": "tblqOs1f4xJU83qSj",
+                            "mode": "list",
+                            "cachedResultName": "Projects",
+                            "cachedResultUrl": "https://airtable.com/app8Vn3LTX8ZI1NxW/tblqOs1f4xJU83qSj"
+                        },
+                        "columns": {
+                            "mappingMode": "defineBelow",
+                            "value": {
+                                "id": "={{ $('DATAAAA').item.json.id }}",
+                                "Email": "={{ JSON.stringify($json.results.emails) }}"
+                            },
+                            "matchingColumns": [
+                                "id"
+                            ],
+                            "schema": [
+                                {
+                                    "id": "id",
+                                    "displayName": "id",
+                                    "required": false,
+                                    "defaultMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": true,
+                                    "removed": false
+                                },
+                                {
+                                    "id": "Title",
+                                    "displayName": "Title",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": true
+                                },
+                                {
+                                    "id": "Street",
+                                    "displayName": "Street",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": true
+                                },
+                                {
+                                    "id": "Neighborhood",
+                                    "displayName": "Neighborhood",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": true
+                                },
+                                {
+                                    "id": "Website",
+                                    "displayName": "Website",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": true
+                                },
+                                {
+                                    "id": "Phone",
+                                    "displayName": "Phone",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": true
+                                },
+                                {
+                                    "id": "Email",
+                                    "displayName": "Email",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": false
+                                },
+                                {
+                                    "id": "URL",
+                                    "displayName": "URL",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": true
+                                }
+                            ],
+                            "attemptToConvertTypes": false,
+                            "convertFieldsToString": false
+                        },
+                        "options": {}
+                    },
+                    "type": "n8n-nodes-base.airtable",
+                    "typeVersion": 2.1,
+                    "position": [
+                        2160,
+                        180
+                    ],
+                    "id": "4e8c061e-d81f-4bec-9613-8b374ed40904",
+                    "name": "Airtable1",
+                    "credentials": {
+                        "airtableTokenApi": {
+                            "id": "kKa7YG2pCWeWD5Z0",
+                            "name": "Airtable Personal Access Token account 2"
+                        }
+                    }
+                },
+                {
+                    "parameters": {
+                        "operation": "create",
+                        "base": {
+                            "__rl": true,
+                            "value": "app8Vn3LTX8ZI1NxW",
+                            "mode": "list",
+                            "cachedResultName": "nha",
+                            "cachedResultUrl": "https://airtable.com/app8Vn3LTX8ZI1NxW"
+                        },
+                        "table": {
+                            "__rl": true,
+                            "value": "tblqOs1f4xJU83qSj",
+                            "mode": "list",
+                            "cachedResultName": "Projects",
+                            "cachedResultUrl": "https://airtable.com/app8Vn3LTX8ZI1NxW/tblqOs1f4xJU83qSj"
+                        },
+                        "columns": {
+                            "mappingMode": "defineBelow",
+                            "value": {
+                                "title": "={{ $('Loop Over Items').item.json.Title }}",
+                                "neighborhood": "={{ $('Loop Over Items').item.json.Neighborhood }}",
+                                "website": "={{ $('Loop Over Items').item.json.Website }}",
+                                "phone": "={{ $('Loop Over Items').item.json.Phone }}",
+                                "email": "={{ $json.message.content }}",
+                                "url": "={{ $('Loop Over Items').item.json.URL }}",
+                                "ADDRESS": "={{ $('Loop Over Items').item.json.Street }}"
+                            },
+                            "matchingColumns": [],
+                            "schema": [
+                                {
+                                    "id": "title",
+                                    "displayName": "title",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": false
+                                },
+                                {
+                                    "id": "neighborhood",
+                                    "displayName": "neighborhood",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": false
+                                },
+                                {
+                                    "id": "website",
+                                    "displayName": "website",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": false
+                                },
+                                {
+                                    "id": "phone",
+                                    "displayName": "phone",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": false
+                                },
+                                {
+                                    "id": "email",
+                                    "displayName": "email",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": false
+                                },
+                                {
+                                    "id": "url",
+                                    "displayName": "url",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": false
+                                },
+                                {
+                                    "id": "ADDRESS",
+                                    "displayName": "ADDRESS",
+                                    "required": false,
+                                    "defaultMatch": false,
+                                    "canBeUsedToMatch": true,
+                                    "display": true,
+                                    "type": "string",
+                                    "readOnly": false,
+                                    "removed": false
+                                }
+                            ],
+                            "attemptToConvertTypes": false,
+                            "convertFieldsToString": false
+                        },
+                        "options": {}
+                    },
+                    "type": "n8n-nodes-base.airtable",
+                    "typeVersion": 2.1,
+                    "position": [
+                        1460,
+                        100
+                    ],
+                    "id": "f6c7ab01-9970-494f-928b-cc5dcb90b5c4",
+                    "name": "DATAAAA",
+                    "credentials": {
+                        "airtableTokenApi": {
+                            "id": "kKa7YG2pCWeWD5Z0",
+                            "name": "Airtable Personal Access Token account 2"
+                        }
+                    }
+                },
+                {
+                    "parameters": {
+                        "method": "POST",
+                        "url": "https://api.apify.com/v2/acts/compass~google-maps-extractor/run-sync-get-dataset-items?token=YOUR_APIFY_API_KEY",
+                        "sendBody": true,
+                        "specifyBody": "json",
+                        "jsonBody": "={\n    \"categoryFilterWords\": [\n        \"photographer\",\n        \"advertising photographer\"\n    ],\n    \"city\": \"austin\",\n    \"countryCode\": \"us\",\n    \"language\": \"en\",\n    \"maxCrawledPlacesPerSearch\": 15,\n    \"skipClosedPlaces\": false,\n    \"state\": \"texas\"\n}",
+                        "options": {}
+                    },
+                    "type": "n8n-nodes-base.httpRequest",
+                    "typeVersion": 4.2,
+                    "position": [
+                        220,
+                        0
+                    ],
+                    "id": "7fb4069f-6009-4d41-9fc1-4885e63742c6",
+                    "name": "MAP THU THẬP"
+                },
+                {
+                    "parameters": {
+                        "url": "=https://r.jina.ai/{{ $json.Website }}",
+                        "options": {}
+                    },
+                    "type": "n8n-nodes-base.httpRequest",
+                    "typeVersion": 4.2,
+                    "position": [
+                        860,
+                        100
+                    ],
+                    "id": "90109d99-696b-407c-bad2-df750bf3993f",
+                    "name": "WEB LỌC",
+                    "onError": "continueRegularOutput"
+                },
+                {
+                    "parameters": {
+                        "method": "POST",
+                        "url": "https://api.anymailfinder.com/v5.0/search/company.json",
+                        "sendHeaders": true,
+                        "headerParameters": {
+                            "parameters": [
+                                {
+                                    "name": "Authorization",
+                                    "value": "Bearer YOUR_ANYMAILFINDER_API_KEY"
+                                }
+                            ]
+                        },
+                        "sendBody": true,
+                        "bodyParameters": {
+                            "parameters": [
+                                {
+                                    "name": "domain",
+                                    "value": "={{ $node[\"Loop Over Items\"].json.Domain }}"
+                                }
+                            ]
+                        },
+                        "options": {}
+                    },
+                    "type": "n8n-nodes-base.httpRequest",
+                    "typeVersion": 4.2,
+                    "position": [
+                        1980,
+                        60
+                    ],
+                    "id": "bf242d89-9ce8-48ad-b0e3-918ad63eafe1",
+                    "name": "MAIL",
+                    "onError": "continueRegularOutput"
+                }
+            ],
+            "pinData": {
+                "When clicking ‘Test workflow’": [
+                    {
+                        "json": {}
+                    }
+                ]
+            },
+            "connections": {
+                "When clicking ‘Test workflow’": {
+                    "main": [
+                        [
+                            {
+                                "node": "MAP THU THẬP",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                },
+                "Edit Fields": {
+                    "main": [
+                        [
+                            {
+                                "node": "Loop Over Items",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                },
+                "Loop Over Items": {
+                    "main": [
+                        [],
+                        [
+                            {
+                                "node": "WEB LỌC",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                },
+                "OpenAI": {
+                    "main": [
+                        [
+                            {
+                                "node": "DATAAAA",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                },
+                "If": {
+                    "main": [
+                        [
+                            {
+                                "node": "MAIL",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ],
+                        [
+                            {
+                                "node": "Loop Over Items",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                },
+                "Airtable1": {
+                    "main": [
+                        [
+                            {
+                                "node": "Loop Over Items",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                },
+                "DATAAAA": {
+                    "main": [
+                        [
+                            {
+                                "node": "If",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                },
+                "MAP THU THẬP": {
+                    "main": [
+                        [
+                            {
+                                "node": "Edit Fields",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                },
+                "WEB LỌC": {
+                    "main": [
+                        [
+                            {
+                                "node": "OpenAI",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                },
+                "MAIL": {
+                    "main": [
+                        [
+                            {
+                                "node": "Airtable1",
+                                "type": "main",
+                                "index": 0
+                            }
+                        ]
+                    ]
+                }
+            },
+            "active": false,
+            "settings": {
+                "executionOrder": "v1"
+            },
+            "versionId": "219c7697-1d7f-43b1-8ba5-f854863d8eb2",
+            "meta": {
+                "instanceId": "ac3b194b798a2134f21c83ccbb5a3390d7ab9f49c67db878cbfbb27d1f73a3ba"
+            },
+            "id": "5O1zQV1WPqn646Je",
+            "tags": []
+        };
+
+        async function downloadJSON() {
+            try {
+                const jsonString = JSON.stringify(workflowData, null, 2);
+                const blob = new Blob([jsonString], { type: "application/json" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'PHOTO_Workflow_n8n.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (err) {
+                console.error('Lỗi khi tải file JSON:', err);
+                alert("Đã xảy ra lỗi khi tạo file tải xuống.");
+            }
+        }
+
+        async function copyWorkflow() {
+            try {
+                const jsonString = JSON.stringify(workflowData, null, 2);
+                await navigator.clipboard.writeText(jsonString);
+
+                // Show toast
+                var toast = document.getElementById("toast");
+                toast.className = "show";
+                setTimeout(function () { toast.className = toast.className.replace("show", ""); }, 3000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                alert("Lỗi không thể copy JSON, vui lòng thử lại.");
+            }
+        }
+    </script>
+</body>
+
+</html>

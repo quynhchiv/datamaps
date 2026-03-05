@@ -1,0 +1,614 @@
+{
+  "name": "PHOTO",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9be5eb13-9dd8-4ac5-9aef-ac67ffb00d79",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e45d7aab-0f67-4ca1-9ffb-02337c56d83e",
+              "name": "Title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "34334186-df38-4d28-a3b9-1c3654fd1f38",
+              "name": "Street",
+              "value": "={{ $json.street }}",
+              "type": "string"
+            },
+            {
+              "id": "326d9ea4-de08-463a-94cd-c3054f5a24e1",
+              "name": "Neighborhood",
+              "value": "={{ $json.neighborhood }}",
+              "type": "string"
+            },
+            {
+              "id": "23d4c925-b7de-48ab-8880-788be5657c89",
+              "name": "Website",
+              "value": "={{ $json.website }}",
+              "type": "string"
+            },
+            {
+              "id": "cb0b1338-4973-4d21-85e0-a166ca626a71",
+              "name": "Phone",
+              "value": "={{ $json.phoneUnformatted }}",
+              "type": "string"
+            },
+            {
+              "id": "d8428394-595c-4f60-9fd1-db90f585d53d",
+              "name": "URL",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "cef93f44-ccae-4230-b294-8e817fe82ce0",
+              "name": "Domain",
+              "value": "={{ $json.website?.extractDomain() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        420,
+        20
+      ],
+      "id": "37b3eead-f217-416c-966c-0ebe8836621d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        640,
+        0
+      ],
+      "id": "166b90e6-8a3b-493c-b3cb-9143abc96a18",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Look at this website content and extract only the email I can contact this business. In your output, provide only the email and nothing else. Ideally, this email should be of business owner, so if you have 2 or more options, try for most authoritative one. If you don't find any email, output null\n\nExamplary output of yours:\n\nname@examplewebsite.com\n\n___\n\nWebsite you should analyse:\n{{$node[\"WEB LỌC\"].json.data}}."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1060,
+        100
+      ],
+      "id": "1a6a274d-cf13-45c5-a062-d38cce3210f0",
+      "name": "OpenAI"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7136a55b-0ab4-4cd0-9c19-20595d6dfca6",
+              "leftValue": "={{ $('OpenAI').item.json.message.content }}",
+              "rightValue": "Null",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1720,
+        100
+      ],
+      "id": "60674365-a2fe-4d8f-bb28-3108149a7a9d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app8Vn3LTX8ZI1NxW",
+          "mode": "list",
+          "cachedResultName": "nha",
+          "cachedResultUrl": "https://airtable.com/app8Vn3LTX8ZI1NxW"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblqOs1f4xJU83qSj",
+          "mode": "list",
+          "cachedResultName": "Projects",
+          "cachedResultUrl": "https://airtable.com/app8Vn3LTX8ZI1NxW/tblqOs1f4xJU83qSj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('DATAAAA').item.json.id }}",
+            "Email": "={{ JSON.stringify($json.results.emails) }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Street",
+              "displayName": "Street",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Neighborhood",
+              "displayName": "Neighborhood",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2160,
+        180
+      ],
+      "id": "4e8c061e-d81f-4bec-9613-8b374ed40904",
+      "name": "Airtable1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "kKa7YG2pCWeWD5Z0",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app8Vn3LTX8ZI1NxW",
+          "mode": "list",
+          "cachedResultName": "nha",
+          "cachedResultUrl": "https://airtable.com/app8Vn3LTX8ZI1NxW"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblqOs1f4xJU83qSj",
+          "mode": "list",
+          "cachedResultName": "Projects",
+          "cachedResultUrl": "https://airtable.com/app8Vn3LTX8ZI1NxW/tblqOs1f4xJU83qSj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $('Loop Over Items').item.json.Title }}",
+            "neighborhood": "={{ $('Loop Over Items').item.json.Neighborhood }}",
+            "website": "={{ $('Loop Over Items').item.json.Website }}",
+            "phone": "={{ $('Loop Over Items').item.json.Phone }}",
+            "email": "={{ $json.message.content }}",
+            "url": "={{ $('Loop Over Items').item.json.URL }}",
+            "ADDRESS": "={{ $('Loop Over Items').item.json.Street }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "neighborhood",
+              "displayName": "neighborhood",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ADDRESS",
+              "displayName": "ADDRESS",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1460,
+        100
+      ],
+      "id": "f6c7ab01-9970-494f-928b-cc5dcb90b5c4",
+      "name": "DATAAAA",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "kKa7YG2pCWeWD5Z0",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/compass~google-maps-extractor/run-sync-get-dataset-items?token=YOUR_APIFY_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"categoryFilterWords\": [\n        \"photographer\",\n        \"advertising photographer\"\n    ],\n    \"city\": \"austin\",\n    \"countryCode\": \"us\",\n    \"language\": \"en\",\n    \"maxCrawledPlacesPerSearch\": 15,\n    \"skipClosedPlaces\": false,\n    \"state\": \"texas\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "7fb4069f-6009-4d41-9fc1-4885e63742c6",
+      "name": "MAP THU THẬP"
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $json.Website }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        100
+      ],
+      "id": "90109d99-696b-407c-bad2-df750bf3993f",
+      "name": "WEB LỌC",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anymailfinder.com/v5.0/search/company.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_ANYMAILFINDER_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "domain",
+              "value": "={{ $node[\"Loop Over Items\"].json.Domain }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        60
+      ],
+      "id": "bf242d89-9ce8-48ad-b0e3-918ad63eafe1",
+      "name": "MAIL",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {
+    "When clicking ‘Test workflow’": [
+      {
+        "json": {}
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "MAP THU THẬP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "WEB LỌC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "DATAAAA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "MAIL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DATAAAA": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAP THU THẬP": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WEB LỌC": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAIL": {
+      "main": [
+        [
+          {
+            "node": "Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "219c7697-1d7f-43b1-8ba5-f854863d8eb2",
+  "meta": {
+    "instanceId": "ac3b194b798a2134f21c83ccbb5a3390d7ab9f49c67db878cbfbb27d1f73a3ba"
+  },
+  "id": "5O1zQV1WPqn646Je",
+  "tags": []
+}
